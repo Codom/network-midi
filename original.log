@@ -1,0 +1,74 @@
+commit 921118f002e60969ee45c2d849e174aef740a0ff
+Merge: e10b5fe 8c2a995
+Author: Christopher Odom <Christopher_Odom@student.uml.edu>
+Date:   Sun Apr 19 17:32:16 2020 -0400
+
+    Merge branch 'master' of github.com:Codom/network-midi
+
+commit e10b5fec2344dc24b753eae185ebf94b9220fec7
+Author: Christopher Odom <Christopher_Odom@student.uml.edu>
+Date:   Sun Apr 19 17:32:10 2020 -0400
+
+    Removed passwords, now I need to merge and squash
+
+commit 224e55ef083b5e608a7a211295d331f18facd116
+Author: Christopher Odom <Christopher_Odom@student.uml.edu>
+Date:   Sun Apr 19 17:23:04 2020 -0400
+
+    Added gitignore
+
+commit 8c2a9953db41621e34f95fd333b1f81e0ed8d3c7
+Author: christopher odom <christopher_odom@student.uml.edu>
+Date:   Sun Apr 19 22:11:45 2020 +0100
+
+    Fixed a flaw the bitwise operations
+
+commit 75e169dfa20c3d068265eb05d55666dec3644884
+Author: christopher odom <christopher_odom@student.uml.edu>
+Date:   Sun Apr 19 18:34:33 2020 +0100
+
+    Added midi pitch-bend message sending
+
+commit 5ac1766dffedd246a1e5ddb1a13c9a72be045737
+Author: christopher odom <christopher_odom@student.uml.edu>
+Date:   Sat Apr 18 17:07:08 2020 +0100
+
+    Added rtmidi link
+
+commit def98764fb25b7ac05312ec1bbddd787aa6a9506
+Author: christopher odom <christopher_odom@student.uml.edu>
+Date:   Thu Apr 16 20:38:01 2020 +0100
+
+    Added c++ rtmidi lib
+
+commit 8196b8c81cd9535dc5bec521a5dd4f0ded5fc459
+Author: Chris Odom <christopher.r.odom@gmail.com>
+Date:   Wed Apr 15 14:21:41 2020 -0400
+
+    Added basic Makefile
+
+commit afe79a9c1451b1ee0d8aa2343b40bb5aa3826304
+Author: Chris Odom <christopher.r.odom@gmail.com>
+Date:   Thu Apr 9 13:59:41 2020 -0400
+
+    Added notes on realtime scheduling and jack
+
+commit 93f80eb5f546e1015b791d382a85069a65c91a29
+Author: Chris Odom <christopher.r.odom@gmail.com>
+Date:   Thu Apr 9 13:58:50 2020 -0400
+
+    Added a simple mqtt listener
+    
+    This listener is based off of an example
+    that can be found here:
+    https://gist.github.com/evgeny-boger/8cefa502779f98efaf24
+
+commit 70675005fe5b4f922025d52300d98f6ca608cd38
+Author: Chris Odom <christopher.r.odom@gmail.com>
+Date:   Mon Mar 30 14:11:22 2020 -0400
+
+    Initial Commit:
+    
+    Contains a basic proposal/design doc,
+    as well as arduino code to read from
+    an analogue expression pedal
