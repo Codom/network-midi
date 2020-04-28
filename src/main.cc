@@ -45,16 +45,22 @@ void on_message(struct mosquitto* client, void* c_arg,
 	unsigned value;
 	unsigned scaled_value;
 	sscanf((const char*) message->payload, "%u", &value);
-	scaled_value = 0x3fff * (value/1024.0); //Scale value to a container that holds 00:MSB:LSB
 	std::vector<unsigned char> midi_mes;
-	midi_mes.push_back(0xE0); // Status and channel bytes
-	midi_mes.push_back(0x7f & scaled_value); // Data byte 1 (least significant byte data)
-	midi_mes.push_back(scaled_value>>7); // Data byte 2 (most significant byte data)
+	// If pitch wheel
+	// midi_mes.push_back(0xE0); // Status and channel bytes
+	// scaled_value = 0x3fff * (value/1024.0); //Scale value to a container that holds 00:MSB:LSB
+	// midi_mes.push_back(0x7f & scaled_value); // Data byte 1 (least significant byte data)
+	// midi_mes.push_back(scaled_value>>7); // Data byte 2 (most significant byte data)
+	// If CC message
+	midi_mes.push_back(0xB0); // Status and channel bytes
+	scaled_value = 0xff * (value/1024.0);
+	midi_mes.push_back(0x4); // CC value
+	midi_mes.push_back(scaled_value); // CC param
 	midiout->sendMessage(&midi_mes);
 	printf("%u    \r", scaled_value);
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[]) {
 	int rc = 0;
 	char id[] = "midi-recv";
 	// Midi init
@@ -66,11 +72,11 @@ int main(int argc, char* argv[]){
 	// Signal init
 	signal(SIGINT, handle_signal);
 	signal(SIGTERM, handle_signal);
-	if(client){
+	if(client) {
 		mosquitto_message_callback_set(client, on_message);
 		rc = mosquitto_connect(client, mqtt_host, mqtt_port, 60);
 		mosquitto_subscribe(client, NULL, "/expr/value", 0);
-		while(run){
+		while(run) {
 			rc = mosquitto_loop(client, -1, 1);
 			if(run && rc) {
 				printf("connection error !\n");
