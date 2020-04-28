@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <csignal>
+#include <cstring>
 #include <mosquitto.h>
 /* C++ Library includes */
 #include <chrono>
@@ -32,7 +33,7 @@ void handle_signal(int s) {
 /* MQTT CALLBACKS */
 
 /**
- * Mqtt on_message callback
+ * Mqtt on_expr_message callback
  * Note: LSB and MSB 'bytes' only use 7 bits of data.
  *
  * At the current moment, I only support two different midi
@@ -40,7 +41,7 @@ void handle_signal(int s) {
  *   - Program Change which will be used to change the current patch
  *   - Control Change which will be mapped to an expression pedal
  */
-void on_message(struct mosquitto* client, void* c_arg,
+void on_expr_message(struct mosquitto* client, void* c_arg,
 		const struct mosquitto_message* message) {
 	unsigned value;
 	unsigned scaled_value;
@@ -60,7 +61,18 @@ void on_message(struct mosquitto* client, void* c_arg,
 	printf("%u    \r", scaled_value);
 }
 
-int main(int argc, char* argv[]) {
+void on_footsw_message(struct mosquitto* client, void* c_arg,
+		const struct mosquitto_message* message) {
+	printf("%s\n",(char*) message->payload);
+}
+
+void on_message(struct mosquitto* client, void* c_arg,
+		const struct mosquitto_message* message) {
+	if(strcmp(message->topic, "/expr/value")==0) on_expr_message(client,c_arg,message);
+	else on_footsw_message(client,c_arg,message);
+}
+
+int main(int argc, char* argv[]){
 	int rc = 0;
 	char id[] = "midi-recv";
 	// Midi init
@@ -68,23 +80,24 @@ int main(int argc, char* argv[]) {
 	midiout->openVirtualPort("net-midi-in"); // Note: The jack/alsa "output", not actual output
 	// Mosquitto init
 	mosquitto_lib_init();
-	struct mosquitto* client = mosquitto_new(id, true, NULL);
+	struct mosquitto* expr_client = mosquitto_new(id, true, NULL);
 	// Signal init
 	signal(SIGINT, handle_signal);
 	signal(SIGTERM, handle_signal);
-	if(client) {
-		mosquitto_message_callback_set(client, on_message);
-		rc = mosquitto_connect(client, mqtt_host, mqtt_port, 60);
-		mosquitto_subscribe(client, NULL, "/expr/value", 0);
-		while(run) {
-			rc = mosquitto_loop(client, -1, 1);
+	if(expr_client){
+		mosquitto_message_callback_set(expr_client, on_message);
+		mosquitto_subscribe(expr_client, NULL, "/expr/value", 0);
+		mosquitto_subscribe(expr_client, NULL, "/footsw/event", 0); // Footsw is event based
+		rc = mosquitto_connect(expr_client, mqtt_host, mqtt_port, 60);
+		while(run){
+			rc = mosquitto_loop(expr_client, -1, 1);
 			if(run && rc) {
-				printf("connection error !\n");
+				puts("connection error!");
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				mosquitto_reconnect(client);
+				mosquitto_reconnect(expr_client);
 			}
 		}
-		mosquitto_destroy(client);
+		mosquitto_destroy(expr_client);
 	}
 	// Cleanup
 	mosquitto_lib_cleanup();
